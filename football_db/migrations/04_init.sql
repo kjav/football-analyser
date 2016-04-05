@@ -16,7 +16,8 @@ CREATE TABLE player_match (
     TotalTackle SMALLINT,
     TotalClearance SMALLINT,
     Interception SMALLINT,
-    AerialWon SMALLINT);
+    AerialWon SMALLINT,
+    MinutesPlayed SMALLINT);
 
 -- rambler down
 
