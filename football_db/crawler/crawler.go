@@ -12,8 +12,8 @@ import (
 const match_address = "http://www.whoscored.com/Matches/"
 
 // the max id we get
-const max_id = 300
-const num_workers = 10
+const max_id = 100000
+const num_workers = 5
 
 // function that get the bytes of the match id from the website
 func match_fetch(matchid int) {
@@ -44,6 +44,10 @@ func match_fetch(matchid int) {
 	}
 }
 
+// data type to send to the workers,
+// last means this job is the last one
+// matchid is the match id to be fetched
+// a matchid of -1 means don't fetch a match
 type job struct {
 	last    bool
 	matchid int
@@ -62,6 +66,9 @@ func create_worker(jobs chan job) {
 }
 
 func main() {
+	// do the eveton match as a reference
+	match_fetch(614052)
+
 	var joblist [num_workers]chan job
 	var v int
 
