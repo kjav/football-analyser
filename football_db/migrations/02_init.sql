@@ -5,7 +5,7 @@ CREATE TABLE match (
     stage bigserial REFERENCES stage(id) NOT NULL,
     home_team bigserial REFERENCES team(id) NOT NULL,
     away_team bigserial REFERENCES team(id) NOT NULL,
-    result bigserial REFERENCES result(id) NOT NULL,
+    result bigserial REFERENCES result(id),
     the_date date NOT NULL
 );
 
