@@ -5,7 +5,6 @@ CREATE TABLE team_match (
     team bigserial REFERENCES team(id) NOT NULL,
     match bigserial REFERENCES match(id) NOT NULL,
     rating NUMERIC(6,3),
-    Position VARCHAR(40),
     Goals SMALLINT,
     TotalScoringAttempts SMALLINT,
     ShotsOnTarget SMALLINT,
