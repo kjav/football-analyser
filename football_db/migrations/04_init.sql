@@ -3,7 +3,7 @@
 CREATE TABLE player_match (
     id bigserial PRIMARY KEY,
     playerid bigserial REFERENCES player(id) NOT NULL,
-    teammatchid bigserial REFERENCES match(id) NOT NULL,
+    teammatchid bigserial REFERENCES team_match(id) NOT NULL,
     rating NUMERIC(6,3),
     Position VARCHAR(40),
     Goals SMALLINT,
