@@ -13,17 +13,17 @@ CREATE TABLE probableLineUp (
     id bigserial PRIMARY KEY,
     matchid bigserial REFERENCES match(id) NOT NULL,
     teamid bigserial REFERENCES team(id) NOT NULL,
-    player1id REFERENCES player(id) NOT NULL,
-    player2id REFERENCES player(id) NOT NULL,
-    player3id REFERENCES player(id) NOT NULL,
-    player4id REFERENCES player(id) NOT NULL,
-    player5id REFERENCES player(id) NOT NULL,
-    player6id REFERENCES player(id) NOT NULL,
-    player7id REFERENCES player(id) NOT NULL,
-    player8id REFERENCES player(id) NOT NULL,
-    player9id REFERENCES player(id) NOT NULL,
-    player10id REFERENCES player(id) NOT NULL,
-    player11id REFERENCES player(id) NOT NULL
+    player1id bigserial REFERENCES player(id) NOT NULL,
+    player2id bigserial REFERENCES player(id) NOT NULL,
+    player3id bigserial REFERENCES player(id) NOT NULL,
+    player4id bigserial REFERENCES player(id) NOT NULL,
+    player5id bigserial REFERENCES player(id) NOT NULL,
+    player6id bigserial REFERENCES player(id) NOT NULL,
+    player7id bigserial REFERENCES player(id) NOT NULL,
+    player8id bigserial REFERENCES player(id) NOT NULL,
+    player9id bigserial REFERENCES player(id) NOT NULL,
+    player10id bigserial REFERENCES player(id) NOT NULL,
+    player11id bigserial REFERENCES player(id) NOT NULL
 );
 
 -- rambler down
