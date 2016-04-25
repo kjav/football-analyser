@@ -21,6 +21,7 @@ query_results = "SELECT * FROM Result"
 results = sql.read_sql(query_results, con = conn)
 query_teams = "SELECT * FROM Team"
 teams = sql.read_sql(query_teams, con = conn)
+conn.close() 
 #print("Teams")
 #print(teams.head())
 #print("Initial matches table")
@@ -41,10 +42,10 @@ matches = matches.rename(columns = {'name': 'home_team'}).drop('i', 1).drop('id_
 matches = pd.merge(matches, teams, left_on = 'i_away', right_on = 'i', how = 'left')
 matches = matches.rename(columns = {'name': 'away_team'}).drop('i',1).drop('id', 1)
 matches = matches.rename(columns = {'id_x': 'id'})
-print("Merged table")
-print (matches.head())
-print(teams)
-print("#####################################################################")
+#print("Merged table")
+#print (matches.head())
+#print(teams)
+#print("#####################################################################")
 
 observed_home_goals = matches.home_goals.values
 observed_away_goals = matches.away_goals.values
@@ -123,10 +124,8 @@ away_goals = pm.Poisson('away_goals',
                           observed=True)
 
 mcmc = pm.MCMC([home, intercept, tau_att, tau_def, 
-                  home_theta, away_theta, 
                   atts_star, defs_star,
-                  atts, defs, 
-                  home_goals, away_goals])
+                  atts, defs])
               
 map_ = pm.MAP( mcmc )
 map_.fit()

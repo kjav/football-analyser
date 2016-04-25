@@ -22,7 +22,7 @@ query3 = "SELECT * FROM Team_Match"
 team_stats = sql.read_sql(query3, con = conn)
 query4 = "SELECT * FROM Team"
 teams = sql.read_sql(query4, con = conn)
-
+conn.close() 
 #print("#####################################################################")
 
 num_teams = len(teams)
@@ -30,7 +30,7 @@ avg_rating = player_stats.rating.mean()
 
 lineup_list = [None]*num_teams
 for i in range(1,num_teams+1):
-    lineup_list[i-1] = probable_lineups[probable_lineups.teamid == i].values[0][2:13]
+    lineup_list[i-1] = list(probable_lineups[probable_lineups.teamid == i].values[0][2:13])
 
 
 def set_up_lineups(team_id, team_lineup):
