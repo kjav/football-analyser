@@ -2,7 +2,7 @@ var express = require("express");
 var app = express();
 var swig = require("swig");
 var router = express.Router();
-var path = __dirname + '/views/';
+var path = __dirname + '/frontend/views/';
 var pg = require('pg');
 var qs = require('querystring');
 var url = require('url');
@@ -105,7 +105,7 @@ router.get("/team",function(req,res){
 
 app.use("/",router);
 
-app.use(express.static('public'));
+app.use(express.static('./frontend/public'));
 
 app.use("*",function(req,res){
   res.sendFile(path + "404.html");
