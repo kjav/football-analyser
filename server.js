@@ -22,11 +22,11 @@ router.use(function (req,res,next) {
 });
 
 router.get("/",function(req,res){
-  res.sendFile(path + "index.html");
-});
-
-router.get("/dashboard",function(req,res){
-  res.sendFile(path + "dashboard.html");
+  pg.connect(conString, function(err, client, done) {
+    client.query('SELECT name, id FROM player', [], function(err, result) {
+      res.render(path + "dashboard.html", { players: result.rows });
+    });
+  });
 });
 
 router.get('/lineup', function(req, res) {
