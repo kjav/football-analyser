@@ -15,58 +15,63 @@ var conString = "postgres://coxswain:Torpids2016@football.c7v4rmvelqsx.eu-west-1
 //this initializes a connection pool
 //it will keep idle connections open for a (configurable) 30 seconds
 //and set a limit of 10 (also configurable)
-pg.connect(conString, function(err, client, done) {
-  if(err) {
-    return console.error('error fetching client from pool', err);
-  }
 
-  router.use(function (req,res,next) {
-    console.log("/" + req.method);
-    next();
-  });
+router.use(function (req,res,next) {
+  console.log("/" + req.method);
+  next();
+});
 
-  router.get("/",function(req,res){
-    res.sendFile(path + "index.html");
-  });
+router.get("/",function(req,res){
+  res.sendFile(path + "index.html");
+});
 
-  router.get("/dashboard",function(req,res){
-    res.sendFile(path + "dashboard.html");
-  });
+router.get("/dashboard",function(req,res){
+  res.sendFile(path + "dashboard.html");
+});
 
-  router.get('/lineup', function(req, res) {
+router.get('/lineup', function(req, res) {
+  pg.connect(conString, function(err, client, done) {
     client.query('SELECT name, id FROM player', [], function(err, result) {
       if (err) console.log(err);
       done();
       res.render(path + 'lineup.html', { players: result.rows });
-    })
+    });
   });
+});
 
-  router.get('/players', function(req, res) {
+router.get('/players', function(req, res) {
+  pg.connect(conString, function(err, client, done) {
     client.query('SELECT name, id FROM player', [], function(err, result) {
       if (err) console.log(err);
       done();
       res.render(path + 'players.html', { players: result.rows });
-    })
+    });
   });
+});
 
-  router.get('/teams', function(req, res) {
+router.get('/teams', function(req, res) {
+  pg.connect(conString, function(err, client, done) {
     client.query('SELECT name, id FROM team', [], function(err, result) {
       if (err) console.log(err);
       done();
       res.render(path + 'teams.html', { teams: result.rows });
-    })
+    });
   });
+});
 
-  router.get('/teammatches', function(req, res) {
+router.get('/teammatches', function(req, res) {
+  pg.connect(conString, function(err, client, done) {
     client.query('SELECT * FROM team_match', [], function(err, result) {
       if (err) console.log(err);
       done();
       res.end(JSON.stringify(result.rows));
-    })
+    });
   });
+});
 
-  router.get("/player",function(req,res){
-    var q = qs.parse(url.parse(req.url).query);
+router.get("/player",function(req,res){
+  var q = qs.parse(url.parse(req.url).query)
+  pg.connect(conString, function(err, client, done) {
     client.query('SELECT name FROM player WHERE id='+q.id, [], function(err, result) {
       if (err) console.log(err);
       done();
@@ -79,9 +84,11 @@ pg.connect(conString, function(err, client, done) {
       });
     });
   });
+});
 
-  router.get("/team",function(req,res){
-    var q = qs.parse(url.parse(req.url).query);
+router.get("/team",function(req,res){
+  var q = qs.parse(url.parse(req.url).query);
+  pg.connect(conString, function(err, client, done) {
     client.query('SELECT name FROM team WHERE id='+q.id, [], function(err, result) {
       if (err) console.log(err);
       done();
@@ -94,16 +101,16 @@ pg.connect(conString, function(err, client, done) {
       });
     });
   });
+});
 
-  app.use("/",router);
+app.use("/",router);
 
-  app.use(express.static('public'));
+app.use(express.static('public'));
 
-  app.use("*",function(req,res){
-    res.sendFile(path + "404.html");
-  });
+app.use("*",function(req,res){
+  res.sendFile(path + "404.html");
+});
 
-  app.listen(3000,function(){
-    console.log("Live at Port 3000");
-  });
+app.listen(3000,function(){
+  console.log("Live at Port 3000");
 });
