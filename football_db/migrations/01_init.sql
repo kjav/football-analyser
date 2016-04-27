@@ -8,6 +8,14 @@ CREATE TABLE team (
 CREATE TABLE player (
     id bigserial PRIMARY KEY,
     name text NOT NULL
+    Position VARCHAR(40),
+    Height SMALLINT,
+    Division SMALLINT,
+    apps SMALLINT,
+    Goals SMALLINT,
+    age SMALLINT,
+    LValue INTEGER,
+    PredictedValue INTEGER
 );
 
 CREATE TABLE stage (
