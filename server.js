@@ -72,7 +72,7 @@ router.get('/teammatches', function(req, res) {
 router.get("/player",function(req,res){
   var q = qs.parse(url.parse(req.url).query)
   pg.connect(conString, function(err, client, done) {
-    client.query('SELECT name FROM player WHERE id='+q.id, [], function(err, result) {
+    client.query('SELECT name, Position, Height, Division, apps, Goals, age, LValue, PredictedValue  FROM player WHERE id='+q.id, [], function(err, result) {
       if (err) console.log(err);
       done();
       var player = result.rows[0];
