@@ -4,6 +4,7 @@ import binascii
 from selenium import webdriver
 import selenium
 import psycopg2
+#import pprint
 
 # These are all the regex's to get the JSON from the page source
 allRegionsReg = re.compile("var allRegions = (?P<data>\[.*?\]);", re.DOTALL)
