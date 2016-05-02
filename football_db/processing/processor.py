@@ -56,13 +56,16 @@ def createteammatch(data, team, goals):
     result['teamId'] = data['matchCentreData'][team]['teamId']
     result['matchId'] = data['matchId']
     result['TotalScoringAttempts'] = sum(stats['shotsTotal'].values())
-    result['ShotsOnTarget'] = sum(stats['shotsOnTarget'].values())
+    if 'shotsOnTarget' in stats :
+        result['ShotsOnTarget'] = sum(stats['shotsOnTarget'].values())
+    else:
+        result['ShotsOnTarget'] = None
     result['KeyPass'] = sum(stats['passesKey'].values())
     result['TotalPass'] = sum(stats['passesTotal'].values())
     result['AccuratePass'] = sum(stats['passesAccurate'].values())
     result['TotalClearance'] = sum(stats['clearances'].values())
     result['Interceptions'] = sum(stats['interceptions'].values())
-    result['AerialWon'] = sum(stats['aerialSuccess'].values())
+    result['AerialWon'] = sum(stats['aerialsWon'].values())
     print "teammatch: "
     pprint.pprint(result)
     return result
@@ -96,11 +99,11 @@ def createplayermatches(data, team, cur):
                 'ShotsOnTarget' :  sumdict(stats, 'shotsOnTarget') if 'shotsOnTarget' in stats else 0,
                 'KeyPass' :  sumdict(stats, 'passesKey') if 'passesKey' in stats else 0,
                 'TotalPass' :  sumdict(stats, 'passesTotal') if 'passesTotal' in stats else 0,
-                'AccuratePass' :  sumdict(stats, 'passesTotal') if 'passesTotal' in stats else 0,
-                'TotalTackle' :  sumdict(stats, 'passesTotal') if 'passesTotal' in stats else 0,
-                'TotalClearance' :  sumdict(stats, 'passesTotal') if 'passesTotal' in stats else 0,
-                'Interceptions' :  sumdict(stats, 'passesTotal') if 'passesTotal' in stats else 0,
-                'AerialWon' :  sumdict(stats, 'passesTotal') if 'passesTotal' in stats else 0
+                'AccuratePass' :  sumdict(stats, 'passesAccurate') if 'passesAccurate' in stats else 0,
+                'TotalTackle' :  sumdict(stats, 'tacklesTotal') if 'tacklesTotal' in stats else 0,
+                'TotalClearance' :  sumdict(stats, 'clearances') if 'clearances' in stats else 0,
+                'Interceptions' :  sumdict(stats, 'interceptions') if 'interceptions' in stats else 0,
+                'AerialWon' :  sumdict(stats, 'aerialsWon') if 'aerialsWon' in stats else 0
             }
             result.append(b)
         except KeyError:
