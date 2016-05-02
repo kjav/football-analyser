@@ -14,6 +14,9 @@ def conv_date(date) :
 # This may be a dubious assumption
 def get_match_ids(curs):
     curs.execute("CREATE TABLE IF NOT EXISTS processed_json_match (matchid bigserial REFERENCES match(id));")
+    curs.execute("CREATE TABLE IF NOT EXISTS event (id bigserial PRIMARY KEY, data jsonb, matchid bigint REFERENCES match(id));")
+    curs.execute("CREATE TABLE IF NOT EXISTS event_type (typeid bigserial PRIMARY KEY, name text);")
+    curs.execute("CREATE TABLE IF NOT EXISTS event_type_satisfied (eventId bigint REFERENCES event(id), typeid bigint REFERENCES event_type(typeid));")
 
     curs.execute("SELECT matchid FROM processed_json_match;")
     rows = curs.fetchall()
@@ -22,8 +25,9 @@ def get_match_ids(curs):
     curs.execute("SELECT match_id FROM match_json;")
     rows = curs.fetchall()
     crawled_ids = map(lambda x: x[0], rows)
-    #return set(crawled_ids) - set(processed)
-    return set([614052])
+    matches = set(crawled_ids) - set(processed)
+    print "processing matches: ", matches
+    return matches
 
 # given an id, get the raw json corresponding
 # to that match
@@ -46,7 +50,7 @@ def createteammatch(data, team, goals):
         'Goals' : goals,
         'ThroughBall' : None,
         'OwnGoals' : None,
-        'TotalTackle' : None
+        'TotalTackle' : sum(stats['tacklesTotal'].values())
     }
 
     result['teamId'] = data['matchCentreData'][team]['teamId']
@@ -63,12 +67,18 @@ def createteammatch(data, team, goals):
     pprint.pprint(result)
     return result
 
-def createplayermatches(data, team):
+def createplayermatches(data, team, cur):
     players = data['matchCentreData'][team]['players']
     result = []
     for player in players :
         stats = player['stats']
         try:
+            player_goals = 0
+            cur.execute("SELECT event.data FROM event, event_type, event_type_satisfied WHERE event_type_satisfied.eventid = event.id AND event_type.typeid = event_type_satisfied.typeid AND event_type.name = 'goalNormal';")
+            for e in cur.fetchall() :
+                e = json.loads(e[0])
+                if player['playerId'] == e['playerId']:
+                    player_goals += 1
             a = set()
             for stat in stats.itervalues() :
                 a | set(stat.iterkeys())
@@ -77,7 +87,7 @@ def createplayermatches(data, team):
                 'Position' : player['position'],
                 'tm_id' : None,
                 'pm_id' : None,
-                'Goals' : None,
+                'Goals' : player_goals,
                 'Rating': stats['ratings'][max(stats['ratings'].iterkeys())],
                 'MinutesPlayed' : minsplayed,
                 'ThroughBalls' : None,
@@ -100,6 +110,19 @@ def createplayermatches(data, team):
     pprint.pprint(result)
     return result
 
+def deal_with_events(data, cur):
+    events = data['matchCentreData']['events']
+    matchid = data['matchId']
+    print "inserting events....."
+    for e in events :
+        eventid = int(e['id'])
+        cur.execute("SELECT * FROM event WHERE id = %s;", (eventid,))
+        a = cur.fetchall()
+        if a == [] :
+            cur.execute("INSERT INTO event(id, data, matchid) VALUES(%s, %s, %s);", (eventid, json.dumps(e), matchid))
+            for i in e['satisfiedEventsTypes']:
+                cur.execute("INSERT INTO event_type_satisfied(typeid, eventid) VALUES(%s, %s);", (i, eventid))
+
 def add_teammatch_to_db(data, cur):
     matchId = data['matchId']
     teamId = data['teamId']
@@ -118,6 +141,15 @@ def add_playermatch_to_db(data, cur, tm_id):
                         (player['playerId'], tm_id, player['Rating'], player['Position'], player['Goals'], player['TotalScoringAttempts'], player['ShotsOnTarget'], player['ThroughBalls'], player['KeyPass'], player['TotalPass'], player['AccuratePass'], player['TotalTackle'], player['TotalClearance'], player['Interceptions'], player['AerialWon'], player['MinutesPlayed']))
 
 def process_match_json(data, cur):
+    # add eventTypeIds
+    eventType = data['matchCentreEventTypeJson']
+    for typename, typeid in eventType.items():
+        cur.execute("SELECT * FROM event_type WHERE typeid = %s;", (typeid,))
+        a = cur.fetchall()
+        if a == [] :
+            print "inserting event type:", typename, " ", typeid
+            cur.execute("INSERT INTO event_type(typeid, name) VALUES(%s, %s);", (typeid, typename))
+
     centre = data['matchCentreData']
     # first make sure we have the players and team in the db,
     # inserting where necessary
@@ -143,7 +175,7 @@ def process_match_json(data, cur):
         cur.execute("SELECT * FROM player WHERE ID = %s;", (player['playerId'],))
         if cur.fetchall() == [] :
             print "inserting player ", player['name'], "into db with id: ", player['name']
-            cur.execute("INSERT INTO player VALUES(%s, %s);",(player['playerId'], player['name'],))
+            cur.execute("INSERT INTO player(id, name, height, age, position) VALUES(%s, %s, %s, %s, %s);",(player['playerId'], player['name'],player['height'], player['age'], player['position']))
 
     # create result for match
     score = re.match("(?P<home>[0-9]*) : (?P<away>[0-9]*)", centre['score'])
@@ -161,15 +193,16 @@ def process_match_json(data, cur):
         cur.execute("SELECT * FROM result where id = %s;", (resultId,))
         print cur.fetchall()
         cur.execute("INSERT INTO match(id, stage, home_team, away_team, result, the_date) Values(%s, %s, %s, %s, %s, %s);",
-                    (data['matchId'], 1, homeid, awayid, resultId, conv_date(date)))
+                    (data['matchId'], 1, homeid, awayid, resultId, date))
 
+    deal_with_events(data, cur)
 
     print "creating dictionaries...."
     away_teammatch = createteammatch(data, "away", score.group("away"))
     home_teammatch = createteammatch(data, "home", score.group("home"))
 
-    away_players = createplayermatches(data, "away")
-    home_players = createplayermatches(data, "home")
+    away_players = createplayermatches(data, "away", cur)
+    home_players = createplayermatches(data, "home", cur)
 
     print "adding dictionaries to database...."
     away_tm_id = add_teammatch_to_db(away_teammatch, cur)
@@ -203,6 +236,8 @@ def main():
             conn.close()
             raise
         else:
+            print "processed"
+            cur.execute("INSERT INTO processed_json_match VALUES(%s);", (data['matchId'],))
             conn.commit()
 
     cur.close()
