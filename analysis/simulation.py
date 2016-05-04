@@ -39,8 +39,8 @@ def simulate_game(home_team, away_team, rtg_scales):
     return (home_goals, away_goals)
 
 def simulate_games(home_team, away_team, rtg_scales, n):
-    total_home = 0
-    total_away = 0
+    total_home = 0.0
+    total_away = 0.0
     for i in range(n):
         (h, a) = simulate_game(home_team, away_team, rtg_scales)
         total_home += h
@@ -52,8 +52,8 @@ def execute():
         lineups = prob_lineups
         home_team = int(sys.stdin.readline())
         away_team = int(sys.stdin.readline())
-        home_lineup = [int(x) for x in input().split()]
-        away_lineup = [int(x) for x in input().split()]
+        home_lineup = [int(x) for x in sys.stdin.readline().split()]
+        away_lineup = [int(x) for x in sys.stdin.readline().split()]
         set_up_lineups(home_team, home_lineup)
         set_up_lineups(away_team, away_lineup)
         #print("Lineups", lineups)
