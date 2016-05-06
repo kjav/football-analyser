@@ -55,38 +55,19 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li><a href="/">Home</a></li>
+            <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
             <li><a href="players">Players</a></li>
-            <li class="active"><a href="teams">Teams <span class="sr-only">(current)</span></a></li>
+            <li><a href="teams">Teams</a></li>
             <li><a href="lineup">Lineup</a></li>
-            <li><a href="editorial">Editorial</a></li>
+            <li class="active"><a href="#">Editorial <span class="sr-only">(current)</span></a></li>
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">{{ team.name }}</h1>
-
-          <img data-player-name="{{ team.name }}" href='#' class="img-profile" />
-
-          <h2 class="sub-header">Matches played</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Opposing team</th>
-                  <th>Team goals</th>
-                  <th>Opposing team goals</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for teammatch in teammatches %}
-                <tr>
-                  <td><a href='/team?id={{ teammatch.otherteamid }}'>{{ teammatch.otherteamname }}</a></td>
-                  <td>{{ teammatch.goals }}</td>
-                  <td>{{ teammatch.otherteamgoals }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+          <h1 class="page-header">Editorial</h1>
+          <iframe frameBorder='0' style='width: 100%; height: 4193px' src='analysis/RefereeAnalysis.html'></iframe>
+          <hr />
+          <iframe frameBorder='0' style='width: 100%; height: 2449px' src='analysis/ShotAnalysis.html'></iframe>
+          
           </div>
         </div>
       </div>
