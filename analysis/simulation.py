@@ -62,9 +62,11 @@ def execute():
         (h, a) = simulate_games(home_team - 1, away_team - 1, rtg_scales, 100000)
         res = (h, a)
         s= str(res)
-        print(s)
-        #sys.stdout.write(s)
+        sys.stdout.write(s + "\n")
+        sys.stdout.flush()
         
+sys.stdout.write("ready for input\n")
+sys.stdout.flush()
 execute()
 """
 ars_lineups = [None] * 5
