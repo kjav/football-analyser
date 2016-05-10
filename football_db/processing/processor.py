@@ -227,7 +227,6 @@ def main():
         conn.close()
         raise e
 
-    print "match_ids being processed: %s" % (match_ids)
     conn.commit()
     for i in match_ids :
         print "Processing match %d" % i
