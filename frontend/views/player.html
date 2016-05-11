@@ -64,19 +64,16 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">{{ player.name }}</h1>
-
-          <img data-player-name="{{ player.name }}" href='#' class="img-profile" />
-<!--          Age: {{player.age}}
-		      Position: {{player.Position}}
-		      Division: {{player.Division}}
-		      Height: {{player.Height}}
-		      apps no idea what it does: {{player.apps}}
-		      Goals: {{player.Goals}}
-		      Lvalue: {{player.LValue}}
-		      PredictedValue: {{player.PredictedValue}}-->
-          <h3 class="sub-header">Matches played</h3>
-          <h2 class="sub-header">Matches played</h2>
-          <div class="table-responsive">
+          <div>
+            <img data-player-name="{{ player.name }}" href='#' class="img-profile" style='float: left; margin-right: 20px;'/>
+              Age: {{player.age}} <br />
+              Position: {{player.position}} <br />
+              Division: {{player.division}} <br />
+              Height: {{player.height}} <br />
+              Goals: {{player.goals}} <br />
+            </div>
+          <h2 style='clear: both' class="sub-header">Matches played</h2>
+          <div style='clear: both' class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -85,6 +82,8 @@
                   <th>Position</th>
                   <th>Goals</th>
                   <th>Passes</th>
+                  <th>Minutes Played</th>
+                  <th>Rating</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,8 +94,19 @@
                   <td>{{ playermatch.position }}</td>
                   <td>{{ playermatch.goals }}</td>
                   <td>{{ playermatch.totalpass }}</td>
+                  <td>{{ playermatch.minutesplayed }}</td>
+                  <td>{{ playermatch.rating }}</td>
                 </tr>
                 {% endfor %}
+                <tr style='background-color: #82bbfa'>
+                  <td>Totals:</td>
+                  <td></td>
+                  <td></td>
+                  <td>{{ totalGoals(playermatches) }}</td>
+                  <td>{{ totalPasses(playermatches) }}</td>
+                  <td>{{ averageMinutesPlayed(playermatches) }}</td>
+                  <td>{{ averageRating(playermatches) }}</td>
+                </tr>
               </tbody>
             </table>
           </div>

@@ -72,7 +72,12 @@ router.get('/lineup', function(req, res) {
     client.query('SELECT name, id FROM player', [], function(err, result) {
       if (err) console.log(err);
       done();
-      res.render(path + 'lineup.html', { players: result.rows });
+      var players = result.rows;
+      client.query('SELECT name, id FROM team', [], function(err, result) {
+        if (err) console.log(err);
+        done();
+        res.render(path + 'lineup.html', { players: players, teams: result.rows });
+      });
     });
   });
 });
@@ -112,16 +117,16 @@ router.get("/player",function(req,res){
   var q = qs.parse(url.parse(req.url).query)
   pg.connect(conString, function(err, client, done) {
     if (err) console.log(err);
-    client.query('SELECT name, Position, Height, Division, apps, Goals, age, LValue, PredictedValue  FROM player WHERE id='+q.id, [], function(err, result) {
+    client.query('SELECT name, Position, Height, Division, apps, Goals, age FROM player WHERE id='+q.id, [], function(err, result) {
       if (err) console.log(err);
       done();
       var player = result.rows[0];
       console.log(player);
-      client.query('SELECT team.name AS teamname, team.id as teamid, other_team.name AS otherteamname, other_team.id as otherteamid, player_match.Position, player_match.Goals, player_match.TotalPass FROM player_match INNER JOIN team_match ON team_match.id=teammatchid INNER JOIN team ON team_match.team=team.id INNER JOIN match ON match.id=team_match.match INNER JOIN team_match other_team_match ON other_team_match.match=match.id AND other_team_match.team!=team.id INNER JOIN team other_team ON other_team.id=other_team_match.team WHERE playerid=' + q.id, [], function(err, result) {
+      client.query('SELECT team.name AS teamname, team.id as teamid, other_team.name AS otherteamname, other_team.id as otherteamid, player_match.Position, player_match.Goals, player_match.TotalPass, player_match.minutesplayed, player_match.rating FROM player_match INNER JOIN team_match ON team_match.id=teammatchid INNER JOIN team ON team_match.team=team.id INNER JOIN match ON match.id=team_match.match INNER JOIN team_match other_team_match ON other_team_match.match=match.id AND other_team_match.team!=team.id INNER JOIN team other_team ON other_team.id=other_team_match.team WHERE playerid=' + q.id, [], function(err, result) {
         if (err) console.log(err);
         var playermatches = result.rows;
         done();
-        res.render(path + "player.html", { player: player, playermatches: playermatches });
+        res.render(path + "player.html", { player: player, playermatches: playermatches, totalGoals: totalGoals, totalPasses: totalPasses, averageMinutesPlayed: averageMinutesPlayed, averageRating: averageRating });
       });
     });
   });
@@ -134,6 +139,7 @@ router.get("/team",function(req,res){
       if (err) console.log(err);
       done();
       var team = result.rows[0];
+      console.log(team);
       client.query('SELECT other_team.name AS otherteamname, other_team.id as otherteamid, team_match.Goals, other_team_match.Goals as otherteamgoals FROM team_match INNER JOIN match ON match.id=team_match.match INNER JOIN team_match other_team_match ON other_team_match.match=match.id AND other_team_match.team!=team_match.team INNER JOIN team other_team ON other_team.id=other_team_match.team WHERE team_match.team=' + q.id, [], function(err, result) {
         if (err) console.log(err);
         var teammatches = result.rows;
@@ -144,11 +150,24 @@ router.get("/team",function(req,res){
   });
 });
 
-router.get("/an", function(req, res) {
-  simulate('1', '2', '1 2 3 4 5 6 7 8 9 10 11', '12 13 14 15 16 17 18 19 20 21 22', function(data) {
+router.get("/analyze", function(req, res) {
+  console.log(req.query);
+  simulate(req.query.team1, req.query.team2, req.query.lineup1, req.query.lineup2, function(data) {
     res.end(data);
   });
 });
+
+router.get("/probablelineup", function(req, res) {
+  console.log(req.query);
+  pg.connect(conString, function(err, client, done) {
+    client.query('SELECT * FROM probablelineup WHERE teamid=' + req.query.teamid, [], function(err, result) {
+      if (err) console.log(err);
+      done();
+      res.end(JSON.stringify(result.rows));
+    });
+  });
+});
+
 app.use("/",router);
 
 app.use(express.static('./frontend/public'));
@@ -160,3 +179,31 @@ app.use("*",function(req,res){
 app.listen(3000,function(){
   console.log("Live at Port 3000");
 });
+
+function totalGoals(xs) {
+  var sum = 0;
+  for (var i=0;i<xs.length;i++)
+    sum += xs[i].goals
+  return sum;
+}
+
+function totalPasses(xs) {
+  var sum = 0;
+  for (var i=0;i<xs.length;i++)
+    sum += xs[i].totalpass
+  return sum;
+}
+
+function averageMinutesPlayed(xs) {
+  var sum = 0;
+  for (var i=0;i<xs.length;i++)
+    sum += xs[i].minutesplayed;
+  return Math.round(sum / xs.length * 10) / 10;
+}
+
+function averageRating(xs) {
+  var sum = 0;
+  for (var i=0;i<xs.length;i++)
+    sum += (+xs[i].rating);
+  return Math.round(10000 * sum / xs.length) / 10000;
+}

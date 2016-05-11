@@ -1,0 +1,15 @@
+-webkit-animation: spin 1s infinite linear;
+
+@-webkit-keyframes spin {
+    0%   {-webkit-transform: rotate(0deg)}
+    100% {-webkit-transform: rotate(360deg)}
+}
+
+.spin: {
+  -webkit-animation-name: spin; /* Chrome, Safari, Opera */
+  -webkit-animation-duration: 1.6s; /* Chrome, Safari, Opera */
+  -webkit-animation-iteration-count: infinite;
+  animation-name: spin;
+  animation-duration: 1.6s;
+  animation-iteration-count: infinite;
+}

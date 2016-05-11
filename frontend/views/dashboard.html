@@ -66,46 +66,10 @@
           <h1 class="page-header">Home</h1>
 
           <div class="row placeholders">
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Lionel Messi" href='#' class="img-headshot"></a>
-              <h4>Lionel Messi</h4>
-              <span class="text-muted">Barcelona</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Cristiano Ronaldo" class="img-headshot"></a>
-              <h4>Cristiano Ronaldo</h4>
-              <span class="text-muted">Real Madrid</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Neymar" class="img-headshot"></a>
-              <h4>Neymar</h4>
-              <span class="text-muted">Barcelona</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Luis Suárez" class="img-headshot"></a>
-              <h4>Luis Suárez</h4>
-              <span class="text-muted">Barcelona</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Robert Lewandowski" class="img-headshot"></a>
-              <h4>Robert Lewandowski</h4>
-              <span class="text-muted">Bayern Munich</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Thomas Müller" class="img-headshot"></a>
-              <h4>Thomas Müller</h4>
-              <span class="text-muted">Bayern Munich</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <a data-player-name="Zlatan Ibrahimović" class="img-headshot"></a>
-              <h4>Zlatan Ibrahimović</h4>
-              <span class="text-muted">PSG</span>
-            </div>
             {% for player in players %}
             <div class="col-xs-6 col-sm-3 placeholder">
               <a data-player-name="{{ player.name }}" class="img-headshot"></a>
               <h4>{{ player.name }}</h4>
-              <span class="text-muted">Team Name</span>
             </div>
             {% endfor %}
           </div>
